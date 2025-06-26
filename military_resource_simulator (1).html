@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Military Resource Allocation Command Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23, #1a1a2e, #16213e);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .command-center {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00ff88;
+            color: #00ff88;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            color: #a0a0a0;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: rgba(0, 255, 136, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 255, 136, 0.1);
+        }
+
+        .panel h3 {
+            color: #00ff88;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .mission-control {
+            grid-column: span 3;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .mission-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .mission-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mission-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .mission-card:hover::before {
+            left: 100%;
+        }
+
+        .mission-card.selected {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            transform: scale(1.05);
+        }
+
+        .mission-card h4 {
+            color: #00ff88;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .mission-difficulty {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .difficulty-easy { background: #2ecc71; color: white; }
+        .difficulty-medium { background: #f39c12; color: white; }
+        .difficulty-hard { background: #e74c3c; color: white; }
+
+        .resource-slider-container {
+            margin-bottom: 20px;
+        }
+
+        .resource-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            color: #a0a0a0;
+        }
+
+        .resource-value {
+            color: #00ff88;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            position: relative;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00ff88;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00ff88;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .analysis-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .resource-comparison {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .comparison-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .comparison-item:last-child {
+            border-bottom: none;
+        }
+
+        .resource-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: #00ff88;
+            transition: width 0.8s ease;
+            border-radius: 2px;
+        }
+
+        .resource-bar.insufficient {
+            background: #e74c3c;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+
+        .status-icon {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+
+        .status-sufficient {
+            background: #2ecc71;
+        }
+
+        .status-insufficient {
+            background: #e74c3c;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .mission-status-display {
+            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-success {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(39, 174, 96, 0.2));
+            border: 2px solid #2ecc71;
+            color: #2ecc71;
+        }
+
+        .status-failure {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.2), rgba(192, 57, 43, 0.2));
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+        }
+
+        .probability-meter {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .meter-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #2ecc71);
+            border-radius: 10px;
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .meter-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .suggestions-panel {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 193, 7, 0.2);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(0, 255, 136, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff88;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #a0a0a0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .alert-success {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+        }
+
+        .alert-error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+
+        .alert-warning {
+            background: rgba(243, 156, 18, 0.2);
+            border: 1px solid #f39c12;
+            color: #f39c12;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mission-log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-success {
+            color: #2ecc71;
+        }
+
+        .log-failure {
+            color: #e74c3c;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 50%;
+            border-top-color: #00ff88;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 1200px) {
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .mission-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .analysis-display {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .quick-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="command-center">
+        <div class="header">
+            <h1>⚡ TACTICAL COMMAND CENTER ⚡</h1>
+            <p>Advanced Military Resource Allocation & Mission Planning System</p>
+        </div>
+
+        <div class="control-grid">
+            <div class="panel">
+                <h3>🎛️ Resource Control</h3>
+                <div class="resource-slider-container">
+                    <div class="resource-label">
+                        <span>👥 Troops</span>
+                        <span class="resource-value" id="troopsValue">450</span>
+                    </div>
+                    <input type="range" class="slider" id="troopsSlider" min="0" max="1000" value="450">
+                </div>
+                
+                <div class="resource-slider-container">
+                    <div class="resource-label">
+                        <span>🍽️ Food</span>
+                        <span class="resource-value" id="foodValue">800</span>
+                    </div>
+                    <input type="range" class="slider" id="foodSlider" min="0" max="2000" value="800">
+                </div>
+                
+                <div class="resource-slider-container">
+                    <div class="resource-label">
+                        <span>🏥 Medkits</span>
+                        <span class="resource-value" id="medkitsValue">250</span>
+                    </div>
+                    <input type="range" class="slider" id="medkitsSlider" min="0" max="500" value="250">
+                </div>
+                
+                <div class="resource-slider-container">
+                    <div class="resource-label">
+                        <span>⛽ Fuel</span>
+                        <span class="resource-value" id="fuelValue">700</span>
+                    </div>
+                    <input type="range" class="slider" id="fuelSlider" min="0" max="1500" value="700">
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="resetResources()">Reset</button>
+                    <button class="btn btn-primary" onclick="optimizeResources()">Auto-Optimize</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>📊 Mission Analysis</h3>
+                
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalMissions">0</span>
+                        <span class="stat-label">Deployed</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="successRate">0%</span>
+                        <span class="stat-label">Success</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="resourceEfficiency">0%</span>
+                        <span class="stat-label">Efficiency</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalCost">$0</span>
+                        <span class="stat-label">Budget</span>
+                    </div>
+                </div>
+
+                <div class="probability-meter">
+                    <h4>Mission Success Probability</h4>
+                    <div class="meter-container">
+                        <div class="meter-fill" id="probabilityMeter" style="width: 0%"></div>
+                    </div>
+                    <span id="probabilityText">0%</span>
+                </div>
+
+                <div class="analysis-display">
+                    <div class="resource-comparison">
+                        <h4 style="color: #00ff88; margin-bottom: 15px;">Resource Status</h4>
+                        <div class="comparison-item" id="troopsComparison">
+                            <span>👥 Troops</span>
+                            <div class="status-indicator">
+                                <div class="status-icon status-sufficient" id="troopsIcon"></div>
+                                <span id="troopsStatus">Ready</span>
+                            </div>
+                            <div class="resource-bar" id="troopsBar" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="comparison-item" id="foodComparison">
+                            <span>🍽️ Food</span>
+                            <div class="status-indicator">
+                                <div class="status-icon status-sufficient" id="foodIcon"></div>
+                                <span id="foodStatus">Ready</span>
+                            </div>
+                            <div class="resource-bar" id="foodBar" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="comparison-item" id="medkitsComparison">
+                            <span>🏥 Medkits</span>
+                            <div class="status-indicator">
+                                <div class="status-icon status-sufficient" id="medkitsIcon"></div>
+                                <span id="medkitsStatus">Ready</span>
+                            </div>
+                            <div class="resource-bar" id="medkitsBar" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="comparison-item" id="fuelComparison">
+                            <span>⛽ Fuel</span>
+                            <div class="status-indicator">
+                                <div class="status-icon status-sufficient" id="fuelIcon"></div>
+                                <span id="fuelStatus">Ready</span>
+                            </div>
+                            <div class="resource-bar" id="fuelBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mission-requirements-display">
+                        <h4 style="color: #00ff88; margin-bottom: 15px;">Mission Requirements</h4>
+                        <div id="requirementsContent">
+                            <p style="text-align: center; color: #a0a0a0; font-style: italic;">Select a mission to view requirements</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>🎯 Intelligence Report</h3>
+                <div id="intelligenceReport">
+                    <div style="text-align: center; color: #a0a0a0;">
+                        <p>🔍 Scanning for threats...</p>
+                        <p style="margin-top: 10px; font-size: 0.9rem;">Weather: Clear ☀️</p>
+                        <p style="font-size: 0.9rem;">Threat Level: <span style="color: #2ecc71;">LOW</span></p>
+                        <p style="font-size: 0.9rem;">Communication: <span style="color: #2ecc71;">OPTIMAL</span></p>
+                    </div>
+                </div>
+
+                <div class="suggestions-panel" id="suggestionsPanel" style="display: none;">
+                    <h4 style="color: #ffc107; margin-bottom: 15px;">⚠️ Strategic Recommendations</h4>
+                    <div id="suggestionsList"></div>
+                </div>
+
+                <div class="mission-log" id="missionLog" style="display: none;">
+                    <h4 style="color: #00ff88; margin-bottom: 10px;">📋 Mission Log</h4>
+                    <div id="logEntries"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel mission-control">
+            <h3>🎖️ Mission Selection & Deployment</h3>
+            
+            <div id="alertContainer"></div>
+            
+            <div class="mission-grid">
+                <div class="mission-card" data-mission="flood" onclick="selectMission('flood')">
+                    <h4>🌊 Flood Rescue</h4>
+                    <div class="mission-difficulty difficulty-medium">MEDIUM</div>
+                    <p>Emergency humanitarian operation in flood-affected areas</p>
+                    <div style="margin-top: 10px; font-size: 0.9rem; color: #a0a0a0;">
+                        Duration: 3-5 days<br>
+                        Risk Level: Moderate<br>
+                        Priority: High
+                    </div>
+                </div>
+                
+                <div class="mission-card" data-mission="border" onclick="selectMission('border')">
+                    <h4>🛡️ Border Patrol</h4>
+                    <div class="mission-difficulty difficulty-easy">EASY</div>
+                    <p>Routine border security and surveillance operation</p>
+                    <div style="margin-top: 10px; font-size: 0.9rem; color: #a0a0a0;">
+                        Duration: 7-14 days<br>
+                        Risk Level: Low<br>
+                        Priority: Medium
+                    </div>
+                </div>
+                
+                <div class="mission-card" data-mission="war" onclick="selectMission('war')">
+                    <h4>⚔️ War Readiness</h4>
+                    <div class="mission-difficulty difficulty-hard">HARD</div>
+                    <p>Full-scale military deployment and combat operations</p>
+                    <div style="margin-top: 10px; font-size: 0.9rem; color: #a0a0a0;">
+                        Duration: 30+ days<br>
+                        Risk Level: High<br>
+                        Priority: Critical
+                    </div>
+                </div>
+            </div>
+
+            <div class="mission-status-display" id="missionStatusDisplay" style="display: none;">
+                <span id="missionStatusText">Mission Status</span>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-danger" onclick="clearSelection()">Clear Selection</button>
+                <button class="btn btn-secondary" onclick="analyzeMission()">🔍 Analyze Mission</button>
+                <button class="btn btn-primary" onclick="deployMission()" id="deployBtn" disabled>🚀 Deploy Mission</button>
+                <button class="btn btn-warning" onclick="showMissionLog()">📋 Mission Log</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced mission data with costs and complexity
+        const missions = {
+            flood: {
+                name: "Flood Rescue",
+                requirements: { troops: 300, food: 600, medkits: 200, fuel: 400 },
+                cost: 250000,
+                complexity: 0.7,
+                description: "Humanitarian rescue operation",
+                duration: "3-5 days",
+                risk: "Moderate"
+            },
+            border: {
+                name: "Border Patrol", 
+                requirements: { troops: 200, food: 500, medkits: 150, fuel: 800 },
+                cost: 180000,
+                complexity: 0.5,
+                description: "Security and surveillance mission",
+                duration: "7-14 days",
+                risk: "Low"
+            },
+            war: {
+                name: "War Readiness",
+                requirements: { troops: 500, food: 1000, medkits: 300, fuel: 900 },
+                cost: 850000,
+                complexity: 0.9,
+                description: "Combat deployment operation",
+                duration: "30+ days",
+                risk: "High"
+            }
+        };
+
+        // Resource management
+        let currentResources = {
+            troops: 450,
+            food: 800,
+            medkits: 250,
+            fuel: 700
+        };
+
+        let selectedMission = null;
+        let deployedMissions = [];
+        let totalBudget = 2000000; // $2M starting budget
+
+        // Initialize the application
+        function init() {
+            initializeSliders();
+            updateQuickStats();
+            updateResourceEfficiency();
+            showAlert('System initialized successfully!', 'success');
+        }
+
+        // Initialize sliders with optimized event handling
+        function initializeSliders() {
+            const sliders = ['troops', 'food', 'medkits', 'fuel'];
+            sliders.forEach(resource => {
+                const slider = document.getElementById(resource + 'Slider');
+                const valueDisplay = document.getElementById(resource + 'Value');
+                
+                // Debounced slider input for better performance
+                let timeout;
+                slider.addEventListener('input', (e) => {
+                    clearTimeout(timeout);
+                    const value = parseInt(e.target.value);
+                    currentResources[resource] = value;
+                    valueDisplay.textContent = value.toLocaleString();
+                    
+                    timeout = setTimeout(() => {
+                        updateAnalysis();
+                        updateResourceEfficiency();
+                    }, 100);
+                });
+            });
+        }
+
+        function selectMission(missionId) {
+            try {
+                // Clear previous selection
+                document.querySelectorAll('.mission-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // Select new mission
+                const selectedCard = document.querySelector(`[data-mission="${missionId}"]`);
+                if (selectedCard) {
+                    selectedCard.classList.add('selected');
+                    selectedMission = missionId;
+                    
+                    updateMissionRequirements();
+                    updateAnalysis();
+                    
+                    document.getElementById('deployBtn').disabled = false;
+                    showAlert(`Mission "${missions[missionId].name}" selected`, 'success');
+                }
+            } catch (error) {
+                showAlert('Error selecting mission', 'error');
+                console.error('Mission selection error:', error);
+            }
+        }
+
+        function updateMissionRequirements() {
+            const requirementsContent = document.getElementById('requirementsContent');
+            
+            if (!selectedMission || !missions[selectedMission]) {
+                requirementsContent.innerHTML = '<p style="text-align: center; color: #a0a0a0; font-style: italic;">Select a mission to view requirements</p>';
+                return;
+            }
+
+            const mission = missions[selectedMission];
+            const req = mission.requirements;
+            
+            requirementsContent.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #00ff88;">${mission.name}</strong><br>
+                    <span style="color: #a0a0a0; font-size: 0.9rem;">${mission.description}</span>
+                </div>
+                <div style="display: grid; gap: 8px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>👥 Troops:</span>
+                        <span style="color: #00ff88;">${req.troops.toLocaleString()}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>🍽️ Food:</span>
+                        <span style="color: #00ff88;">${req.food.toLocaleString()}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>🏥 Medkits:</span>
+                        <span style="color: #00ff88;">${req.medkits.toLocaleString()}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>⛽ Fuel:</span>
+                        <span style="color: #00ff88;">${req.fuel.toLocaleString()}</span>
+                    </div>
+                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>💰 Cost:</span>
+                            <span style="color: #ffc107;">$${mission.cost.toLocaleString()}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>⏱️ Duration:</span>
+                            <span style="color: #a0a0a0;">${mission.duration}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>⚠️ Risk:</span>
+                            <span style="color: ${mission.risk === 'High' ? '#e74c3c' : mission.risk === 'Moderate' ? '#f39c12' : '#2ecc71'};">${mission.risk}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateAnalysis() {
+            if (!selectedMission || !missions[selectedMission]) {
+                resetAnalysisDisplay();
+                return;
+            }
+
+            const mission = missions[selectedMission];
+            const req = mission.requirements;
+            
+            // Check each resource
+            const resourceChecks = {
+                troops: currentResources.troops >= req.troops,
+                food: currentResources.food >= req.food,
+                medkits: currentResources.medkits >= req.medkits,
+                fuel: currentResources.fuel >= req.fuel
+            };
+
+            // Update resource status indicators
+            Object.keys(resourceChecks).forEach(resource => {
+                const sufficient = resourceChecks[resource];
+                const available = currentResources[resource];
+                const required = req[resource];
+                const percentage = Math.min((available / required) * 100, 100);
+                
+                // Update status icon and text
+                const icon = document.getElementById(resource + 'Icon');
+                const status = document.getElementById(resource + 'Status');
+                const bar = document.getElementById(resource + 'Bar');
+                
+                if (sufficient) {
+                    icon.className = 'status-icon status-sufficient';
+                    status.textContent = `${available.toLocaleString()}/${required.toLocaleString()} ✓`;
+                    status.style.color = '#2ecc71';
+                    bar.className = 'resource-bar';
+                } else {
+                    icon.className = 'status-icon status-insufficient';
+                    status.textContent = `${available.toLocaleString()}/${required.toLocaleString()} ✗`;
+                    status.style.color = '#e74c3c';
+                    bar.className = 'resource-bar insufficient';
+                }
+                
+                bar.style.width = Math.min(percentage, 100) + '%';
+            });
+
+            // Calculate overall mission probability
+            const overallSuccess = Object.values(resourceChecks).every(check => check);
+            const resourceRatios = Object.keys(req).map(resource => 
+                Math.min(currentResources[resource] / req[resource], 1)
+            );
+            const averageRatio = resourceRatios.reduce((a, b) => a + b, 0) / resourceRatios.length;
+            const baseProbability = averageRatio * 100;
+            
+            // Factor in mission complexity
+            const complexityPenalty = mission.complexity * 20; // Up to 20% penalty for complexity
+            const finalProbability = Math.max(0, Math.round(baseProbability - complexityPenalty));
+            
+            // Update probability meter
+            const meter = document.getElementById('probabilityMeter');
+            const probabilityText = document.getElementById('probabilityText');
+            meter.style.width = finalProbability + '%';
+            probabilityText.textContent = finalProbability + '%';
+
+            // Update mission status
+            const statusDisplay = document.getElementById('missionStatusDisplay');
+            const statusText = document.getElementById('missionStatusText');
+            statusDisplay.style.display = 'block';
+            
+            if (overallSuccess) {
+                statusDisplay.className = 'mission-status-display status-success';
+                statusText.textContent = `✅ ${mission.name} - MISSION READY FOR DEPLOYMENT`;
+            } else {
+                statusDisplay.className = 'mission-status-display status-failure';
+                statusText.textContent = `❌ ${mission.name} - INSUFFICIENT RESOURCES`;
+            }
+
+            // Update suggestions
+            updateSuggestions(req, resourceChecks);
+        }
+
+        function resetAnalysisDisplay() {
+            // Reset all resource indicators
+            ['troops', 'food', 'medkits', 'fuel'].forEach(resource => {
+                const icon = document.getElementById(resource + 'Icon');
+                const status = document.getElementById(resource + 'Status');
+                const bar = document.getElementById(resource + 'Bar');
+                
+                icon.className = 'status-icon status-sufficient';
+                status.textContent = 'Ready';
+                status.style.color = '#2ecc71';
+                bar.style.width = '0%';
+                bar.className = 'resource-bar';
+            });
+
+            // Reset probability meter
+            document.getElementById('probabilityMeter').style.width = '0%';
+            document.getElementById('probabilityText').textContent = '0%';
+            
+            // Hide mission status and suggestions
+            document.getElementById('missionStatusDisplay').style.display = 'none';
+            document.getElementById('suggestionsPanel').style.display = 'none';
+        }
+
+        function updateSuggestions(requirements, checks) {
+            const suggestionsPanel = document.getElementById('suggestionsPanel');
+            const suggestionsList = document.getElementById('suggestionsList');
+            
+            const insufficient = Object.keys(checks).filter(resource => !checks[resource]);
+            
+            if (insufficient.length === 0) {
+                suggestionsPanel.style.display = 'none';
+                return;
+            }
+
+            suggestionsPanel.style.display = 'block';
+            suggestionsList.innerHTML = '';
+
+            const resourceNames = {
+                troops: 'Troops',
+                food: 'Food Supplies',
+                medkits: 'Medical Kits',
+                fuel: 'Fuel Units'
+            };
+
+            const resourceIcons = {
+                troops: '👥',
+                food: '🍽️',
+                medkits: '🏥',
+                fuel: '⛽'
+            };
+
+            insufficient.forEach(resource => {
+                const shortage = requirements[resource] - currentResources[resource];
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerHTML = `
+                    <span>${resourceIcons[resource]}</span>
+                    <span>Acquire ${shortage.toLocaleString()} additional ${resourceNames[resource]}</span>
+                    <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8rem; min-width: auto;" onclick="autoAdjust('${resource}', ${requirements[resource]})">Auto-Fix</button>
+                `;
+                suggestionsList.appendChild(div);
+            });
+        }
+
+        function updateQuickStats() {
+            document.getElementById('totalMissions').textContent = deployedMissions.length;
+            
+            const successfulMissions = deployedMissions.filter(m => m.successful).length;
+            const successRate = deployedMissions.length > 0 ? Math.round((successfulMissions / deployedMissions.length) * 100) : 0;
+            document.getElementById('successRate').textContent = successRate + '%';
+            
+            const totalCost = deployedMissions.reduce((sum, mission) => sum + mission.cost, 0);
+            const remainingBudget = totalBudget - totalCost;
+            document.getElementById('totalCost').textContent = '$' + remainingBudget.toLocaleString();
+        }
+
+        function updateResourceEfficiency() {
+            const totalResourcesAvailable = Object.values(currentResources).reduce((a, b) => a + b, 0);
+            const maxPossibleResources = 1000 + 2000 + 500 + 1500; // Sum of all slider max values
+            const efficiency = Math.round((totalResourcesAvailable / maxPossibleResources) * 100);
+            document.getElementById('resourceEfficiency').textContent = efficiency + '%';
+        }
+
+        function autoAdjust(resource, target) {
+            try {
+                const maxValues = { troops: 1000, food: 2000, medkits: 500, fuel: 1500 };
+                const adjustedTarget = Math.min(target, maxValues[resource]);
+                
+                currentResources[resource] = adjustedTarget;
+                document.getElementById(resource + 'Slider').value = adjustedTarget;
+                document.getElementById(resource + 'Value').textContent = adjustedTarget.toLocaleString();
+                
+                updateAnalysis();
+                updateResourceEfficiency();
+                showAlert(`${resource} adjusted to ${adjustedTarget.toLocaleString()}`, 'success');
+            } catch (error) {
+                showAlert('Error adjusting resources', 'error');
+                console.error('Auto-adjust error:', error);
+            }
+        }
+
+        function resetResources() {
+            const defaultResources = { troops: 450, food: 800, medkits: 250, fuel: 700 };
+            Object.keys(defaultResources).forEach(resource => {
+                currentResources[resource] = defaultResources[resource];
+                document.getElementById(resource + 'Slider').value = defaultResources[resource];
+                document.getElementById(resource + 'Value').textContent = defaultResources[resource].toLocaleString();
+            });
+            updateAnalysis();
+            updateResourceEfficiency();
+            showAlert('Resources reset to default values', 'success');
+        }
+
+        function optimizeResources() {
+            if (!selectedMission) {
+                showAlert('Select a mission first!', 'warning');
+                return;
+            }
+
+            const mission = missions[selectedMission];
+            const req = mission.requirements;
+            const maxValues = { troops: 1000, food: 2000, medkits: 500, fuel: 1500 };
+            
+            // Set resources to exactly what's needed plus 10% buffer, but not exceeding max
+            Object.keys(req).forEach(resource => {
+                const optimizedValue = Math.min(Math.round(req[resource] * 1.1), maxValues[resource]);
+                currentResources[resource] = optimizedValue;
+                document.getElementById(resource + 'Slider').value = optimizedValue;
+                document.getElementById(resource + 'Value').textContent = optimizedValue.toLocaleString();
+            });
+            
+            updateAnalysis();
+            updateResourceEfficiency();
+            showAlert('Resources optimized for selected mission', 'success');
+        }
+
+        function analyzeMission() {
+            if (!selectedMission) {
+                showAlert('Select a mission first!', 'warning');
+                return;
+            }
+            
+            // Add loading effect
+            const analyzeBtn = document.querySelector('button[onclick="analyzeMission()"]');
+            const originalText = analyzeBtn.innerHTML;
+            analyzeBtn.innerHTML = '<span class="loading"></span> Analyzing...';
+            analyzeBtn.disabled = true;
+            
+            setTimeout(() => {
+                updateAnalysis();
+                analyzeBtn.innerHTML = originalText;
+                analyzeBtn.disabled = false;
+                showAlert('Mission analysis complete', 'success');
+            }, 1500);
+        }
+
+        function deployMission() {
+            if (!selectedMission) {
+                showAlert('Select a mission first!', 'warning');
+                return;
+            }
+
+            const mission = missions[selectedMission];
+            const req = mission.requirements;
+            
+            // Check if mission is feasible
+            const feasible = Object.keys(req).every(resource => currentResources[resource] >= req[resource]);
+            
+            if (!feasible) {
+                showAlert('Cannot deploy mission - insufficient resources!', 'error');
+                return;
+            }
+
+            // Check budget
+            const totalCost = deployedMissions.reduce((sum, m) => sum + m.cost, 0);
+            if (totalCost + mission.cost > totalBudget) {
+                showAlert('Cannot deploy mission - insufficient budget!', 'error');
+                return;
+            }
+
+            // Add loading effect for deployment
+            const deployBtn = document.getElementById('deployBtn');
+            const originalText = deployBtn.innerHTML;
+            deployBtn.innerHTML = '<span class="loading"></span> Deploying...';
+            deployBtn.disabled = true;
+
+            setTimeout(() => {
+                // Calculate success probability
+                const resourceRatios = Object.keys(req).map(resource => 
+                    Math.min(currentResources[resource] / req[resource], 1)
+                );
+                const averageRatio = resourceRatios.reduce((a, b) => a + b, 0) / resourceRatios.length;
+                const baseProbability = averageRatio;
+                const complexityPenalty = mission.complexity * 0.2;
+                const finalProbability = Math.max(0.1, baseProbability - complexityPenalty);
+
+                // Simulate deployment
+                const deployedMission = {
+                    id: Date.now(),
+                    name: mission.name,
+                    cost: mission.cost,
+                    successful: Math.random() < finalProbability,
+                    timestamp: new Date(),
+                    probability: Math.round(finalProbability * 100)
+                };
+
+                deployedMissions.push(deployedMission);
+                
+                // Consume resources
+                Object.keys(req).forEach(resource => {
+                    currentResources[resource] -= req[resource];
+                    document.getElementById(resource + 'Slider').value = currentResources[resource];
+                    document.getElementById(resource + 'Value').textContent = currentResources[resource].toLocaleString();
+                });
+
+                // Add to mission log
+                addToMissionLog(deployedMission);
+
+                // Show result
+                const resultMessage = deployedMission.successful 
+                    ? `Mission "${mission.name}" deployed successfully! ✅ MISSION SUCCESSFUL!` 
+                    : `Mission "${mission.name}" deployed but failed. ❌ MISSION FAILED!`;
+                
+                const alertType = deployedMission.successful ? 'success' : 'error';
+                showAlert(resultMessage, alertType);
+                
+                // Reset UI
+                deployBtn.innerHTML = originalText;
+                deployBtn.disabled = false;
+                clearSelection();
+                updateQuickStats();
+                updateResourceEfficiency();
+            }, 2000);
+        }
+
+        function addToMissionLog(mission) {
+            const logEntries = document.getElementById('logEntries');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${mission.successful ? 'log-success' : 'log-failure'}`;
+            
+            const timeStr = mission.timestamp.toLocaleTimeString();
+            const dateStr = mission.timestamp.toLocaleDateString();
+            const statusIcon = mission.successful ? '✅' : '❌';
+            
+            logEntry.innerHTML = `
+                <strong>${statusIcon} ${mission.name}</strong><br>
+                <small>${dateStr} ${timeStr} | Cost: $${mission.cost.toLocaleString()} | Probability: ${mission.probability}%</small>
+            `;
+            
+            logEntries.insertBefore(logEntry, logEntries.firstChild);
+            
+            // Limit log entries to last 10
+            while (logEntries.children.length > 10) {
+                logEntries.removeChild(logEntries.lastChild);
+            }
+        }
+
+        function showMissionLog() {
+            const missionLog = document.getElementById('missionLog');
+            missionLog.style.display = missionLog.style.display === 'none' ? 'block' : 'none';
+            
+            if (deployedMissions.length === 0) {
+                document.getElementById('logEntries').innerHTML = '<p style="text-align: center; color: #a0a0a0;">No missions deployed yet</p>';
+            }
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.mission-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            selectedMission = null;
+            document.getElementById('deployBtn').disabled = true;
+            document.getElementById('missionStatusDisplay').style.display = 'none';
+            document.getElementById('suggestionsPanel').style.display = 'none';
+            
+            updateMissionRequirements();
+            resetAnalysisDisplay();
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            alertContainer.appendChild(alert);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 3000);
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'r':
+                        e.preventDefault();
+                        resetResources();
+                        break;
+                    case 'o':
+                        e.preventDefault();
+                        optimizeResources();
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        if (selectedMission && !document.getElementById('deployBtn').disabled) {
+                            deployMission();
+                        }
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
